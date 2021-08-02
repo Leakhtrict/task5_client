@@ -2,7 +2,7 @@ import './App.css';
 import { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
 
-const socket = io("http://localhost:3101");
+const socket = io("https://itransition-summer-task5.herokuapp.com/");
 
 function App() {
 
