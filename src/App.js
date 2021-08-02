@@ -9,8 +9,6 @@ function App() {
   const canvasRef = useRef(null);
   const contextRef = useRef(null);
 
-  const [allElements, setAllElements] = useState([]);
-  const [element, setElement] = useState([{}]);
   const [drawing, setDrawing] = useState(false);
   const [erasing, setErasing] = useState(false);
   const [tool, setTool] = useState("cursor");
@@ -79,7 +77,6 @@ function App() {
       setMouseState("down");
 
       const { clientX, clientY } = event;
-      setElement(prevState => [...prevState, { x: clientX-32, y: clientY }]);
       contextRef.current.beginPath();
       contextRef.current.moveTo(clientX-32, clientY);
       contextRef.current.lineWidth = 3;
@@ -87,16 +84,17 @@ function App() {
       socket.emit("sendElement", elem);
     } else if (tool === "text"){
       const textInput = prompt("Enter your text: ", "");
-      const { clientX, clientY } = event;
-      contextRef.current.fillText(textInput, clientX-32, clientY);
-      const sendText = { textInput: textInput, x: clientX-32, y: clientY };
-      socket.emit("sendText", sendText);
+      if(textInput){
+        const { clientX, clientY } = event;
+        contextRef.current.fillText(textInput, clientX-32, clientY);
+        const sendText = { textInput: textInput, x: clientX-32, y: clientY };
+        socket.emit("sendText", sendText);
+      }
     } else if (tool === "eraser"){
       setErasing(true);
       setMouseState("down");
 
       const { clientX, clientY } = event;
-      setElement(prevState => [...prevState, { x: clientX-32, y: clientY }]);
       contextRef.current.strokeStyle = "white";
       contextRef.current.beginPath();
       contextRef.current.moveTo(clientX-32, clientY);
@@ -112,7 +110,6 @@ function App() {
 
       setMouseState("move");
       const { clientX, clientY } = event;
-      setElement(prevState => [...prevState, { x: clientX-32, y: clientY }]);
       contextRef.current.lineTo(clientX-32, clientY);
       contextRef.current.stroke();
       const elem = { x: clientX - 32, y: clientY, tool: tool, mouseState: mouseState, currentColor: currentColor };
@@ -122,7 +119,6 @@ function App() {
 
       setMouseState("move");
       const { clientX, clientY } = event;
-      setElement(prevState => [...prevState, { x: clientX-32, y: clientY }]);
       contextRef.current.lineTo(clientX-32, clientY);
       contextRef.current.stroke();
       const elem = { x: clientX - 32, y: clientY, tool: tool, mouseState: mouseState };
@@ -133,19 +129,16 @@ function App() {
   const handleMouseUp = () => {
     if (tool === "draw"){
       setMouseState("up");
-      setAllElements(prevState => [...prevState, element]);
       contextRef.current.closePath();
       setDrawing(false);
       const elem = { tool: tool, mouseState: mouseState };
       socket.emit("sendElement", elem);
-      setElement([]);
     } else if (tool === "eraser"){
       setMouseState("up");
       contextRef.current.closePath();
       setErasing(false);
       const elem = { tool: tool, mouseState: mouseState };
       socket.emit("sendElement", elem);
-      setElement([]);
     }
   };
 
