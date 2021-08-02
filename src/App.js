@@ -27,6 +27,7 @@ function App() {
       contextRef.current.lineTo(x, y);
       contextRef.current.stroke();
     } else if (mouseState === "up"){
+      contextRef.current.strokeStyle = (tool === "eraser") ? "white" : currentColor;
       contextRef.current.closePath();
     }
   });
