@@ -78,6 +78,7 @@ function App() {
       setMouseState("down");
 
       const { clientX, clientY } = event;
+      contextRef.current.strokeStyle = currentColor;
       contextRef.current.beginPath();
       contextRef.current.moveTo(clientX-32, clientY);
       contextRef.current.lineWidth = 3;
